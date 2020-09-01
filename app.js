@@ -1,8 +1,8 @@
 ﻿(function () {
     'use strict';
 
-    angular
-        .module('app', ['ngRoute', 'ngCookies'])
+    angular // AngularJS 기본 객체
+        .module('app', ['ngRoute', 'ngCookies']) // 모듈이름, 참조하는 다른 모듈 배열
         .config(config)
         .run(run);
 
@@ -27,8 +27,9 @@
                 templateUrl: 'register/register.view.html',
                 controllerAs: 'vm'
             })
-
+           
             .otherwise({ redirectTo: '/login' });
+            console.log("config");
     }
 
     run.$inject = ['$rootScope', '$location', '$cookies', '$http'];
@@ -47,6 +48,8 @@
                 $location.path('/login');
             }
         });
+
+        console.log("run");
     }
 
 })();
