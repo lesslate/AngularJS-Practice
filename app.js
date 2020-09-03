@@ -38,13 +38,18 @@
 
     // run은 실행 단계에 진입시 가장 먼저 호출되는데 초기화가 필요하다면 사용(서비스 객체만 주입가능)
     run.$inject = [ '$rootScope', '$location', '$cookies', '$http' ];
-    function run ($rootScope, $location, $cookies, $http)
+    function run ($rootScope, $location, $cookies, $http,)
     {
         // keep user logged in after page refresh
         $rootScope.globals = $cookies.getObject('globals') || {};
-        if ($rootScope.globals.currentUser)
+        if ($rootScope.globals.currentUser) //
         {
-            $http.defaults.headers.common[ 'Authorization' ] = 'Basic ' + $rootScope.globals.currentUser.authdata;
+            $http.defaults.headers.common[ 'Authorization' ] = "Bearer " + $rootScope.globals.currentUser.authdata;
+            // $http.get('http://localhost:3000/restricted')
+            //     .then(function (response)
+            //     {
+            //         console.log("data : " + response.data.status)
+            //     });
         }
 
         $rootScope.$on('$locationChangeStart', function (event, next, current)
@@ -52,6 +57,7 @@
             // 로그인 되지않았거나 해당되는 요소가 없을경우 -1 반환되어 true 가되어 로그인 페이지 redirect
             var restrictedPage = $.inArray($location.path(), [ '/login', '/register' ]) === -1;
             var loggedIn = $rootScope.globals.currentUser;
+
             if (restrictedPage && !loggedIn)
             { // login, register 외에 페이지나, 로그인 돼있지 않다면
                 $location.path('/login');

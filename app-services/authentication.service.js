@@ -22,50 +22,59 @@
 
             /* Dummy authentication for testing, uses $timeout to simulate api call
              ----------------------------------------------*/
-            $timeout(function ()
-            {
-                var response;
-                UserService.GetByUsername(username)
-                    .then(function (user)
-                    {
-                        if (user !== null && user.password === password)
-                        {
-                            response = { success: true };
-                        } else
-                        {
-                            response = { success: false, message: 'Username or password is incorrect' };
-                        }
-                        callback(response);
-                    });
-            }, 1000);
+            // $timeout(function ()
+            // {
+            //     var response;
+            //     UserService.GetByUsername(username)
+            //         .then(function (user)
+            //         {
+            //             if (user !== null && user.password === password)
+            //             {
+            //                 response = { success: true };
+            //             } else
+            //             {
+            //                 response = { success: false, message: 'Username or password is incorrect' };
+            //             }
+            //             callback(response);
+            //         });
+            // }, 1000);
 
-            /* Use this for real authentication
+            /* Use this for real authentication http://1.255.134.177:3000/login
              ----------------------------------------------*/
-            //$http.post('/api/authenticate', { username: username, password: password })
-            //    .success(function (response) {
-            //        callback(response);
-            //    });
+            $http.post('http://localhost:3000/login', { username: username, password: password })
+                .then(function (response)
+                {
+                    //console.log(response.data.token);
+                    callback(response);
+                });  // JWT 토큰 받기
+
+
+            // success(function (response) // success는 deprecated -> then사용
+            // {
+            //     callback(response);
+            // });
 
         }
 
-        function SetCredentials (username, password)
+        function SetCredentials (username, password, token)
         {
-            var authdata = Base64.encode(username + ':' + password);
-
+            //var authdata = Base64.encode(username + ':' + password);
             $rootScope.globals = {
                 currentUser: {
                     username: username,
-                    authdata: authdata
+                    authdata: token
                 }
             };
 
-            // set default auth header for http requests
-            $http.defaults.headers.common[ 'Authorization' ] = 'Basic ' + authdata;
+            // // set default auth header for http requests
+            //$http.defaults.headers.common[ 'Authorization' ] = token;
 
             // store user details in globals cookie that keeps user logged in for 1 week (or until they logout)
             var cookieExp = new Date();
             cookieExp.setDate(cookieExp.getDate() + 7);
             $cookies.putObject('globals', $rootScope.globals, { expires: cookieExp });
+            // 유저이름 , 토큰 쿠키에 저장
+
         }
 
         function ClearCredentials ()
